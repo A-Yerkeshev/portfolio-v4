@@ -48,15 +48,21 @@ const log = console.log;
 function fillTemplate(template, data) {
   data = JSON.parse(JSON.stringify(data));
 
+  // If template is unparsed string - try to parse it as HTML
+  try {
+    const parser = new DOMParser();
+    template = parser.parseFromString(template, 'text/html');
+  } catch(error) {
+    throw new Error('First argument passed to "fillTemplate" function is not a valid HTML string. Parsing error: ' + error.message);
+  }
+
   // Check if template is a node element
   if (!('nodeType' in template) || template.nodeType !== Node.ELEMENT_NODE) {
-    throw new Error('First argument passed to "fillTemplate" function must be a node element.');
-    return;
+    throw new Error('First argument passed to "fillTemplate" function must be a node element or string.');
   }
   // Check if data is object
   if (typeof data !== 'object') {
     throw new Error('Second argument passed to "fillTemplate" function must be an object.');
-    return;
   }
 
   template = template.cloneNode(true);
